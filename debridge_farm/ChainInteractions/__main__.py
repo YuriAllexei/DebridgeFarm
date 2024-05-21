@@ -1,5 +1,8 @@
 from pprint import pprint
 
+from .chain_utils import send_dln_order
+from .infura_utils import get_infura_url
+
 from ApiUtils import (
     get_chain_info,
     get_chain_token_list,
@@ -69,4 +72,15 @@ if __name__ == "__main__":
         dst_param=optimism_usdc_quote_param,
     )
 
-    pprint(tx)
+    infura_url = get_infura_url(
+        quote_param=arbitrum_usdc_quote_param,
+        infura_key="9e13214a449b4aaa903ec565642b91c0",
+    )
+    print(tx)
+
+    # send_dln_order(
+    #     infura_url=infura_url,
+    #     address=address,
+    #     tx_data=tx,
+    #     private_key="738862141af6ea6ebac73a1545548e40745be4085e38d64c7c3c15b4db7d1fcf",
+    # )
