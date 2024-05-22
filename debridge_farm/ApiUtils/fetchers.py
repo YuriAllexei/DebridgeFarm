@@ -1,7 +1,8 @@
 import requests
 from typing import List, Optional
 
-from Abstractions import ChainInfo, TokenInfo, QuoteParam, QuoteInfo, TxData
+from ..Abstractions import ChainInfo, TokenInfo, QuoteParam, QuoteInfo, TxData
+
 
 from .data_utils import retrieve_quote_info
 

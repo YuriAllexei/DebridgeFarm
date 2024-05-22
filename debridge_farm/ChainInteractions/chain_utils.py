@@ -1,7 +1,8 @@
 import json
 from web3 import Web3
+from eth_abi import encode, decode
 
-from Abstractions import TxData
+from ..Abstractions import TxData, QuoteParam
 
 
 def send_dln_order(infura_url: str, address: str, private_key: str, tx_data: TxData):
@@ -24,3 +25,32 @@ def send_dln_order(infura_url: str, address: str, private_key: str, tx_data: TxD
 
     tx_receipt = web3_object.eth.wait_for_transaction_receipt(tx_hash)
     print(f"Transaction receipt: {tx_receipt}")
+
+
+def query_erc_20_balance(
+    infura_url: str, src_quote_param: QuoteParam, account_address: str
+) -> float:
+
+    web3 = Web3(Web3.HTTPProvider(infura_url))
+
+    contract_checksum_address = Web3.to_checksum_address(
+        value=src_quote_param["token_info"]["address"]
+    )
+
+    function_signature = Web3.keccak(text="balanceOf(address)")[0:4].hex()
+    encoded_params = encode(["address"], [account_address]).hex()
+
+    result = web3.eth.call(
+        {"to": contract_checksum_address, "data": function_signature + encoded_params}
+    )
+
+    decoded_result = decode(["uint256"], result)[0]
+
+    return decoded_result / (10 ** src_quote_param["token_info"]["decimals"])
+
+
+def query_native_token_balance(infura_url: str, account_address: str) -> float:
+    web3 = Web3(Web3.HTTPProvider(infura_url))
+    balance_wei = web3.eth.get_balance(account=account_address)
+    balance_ether = web3.from_wei(balance_wei, "ether")
+    return balance_ether

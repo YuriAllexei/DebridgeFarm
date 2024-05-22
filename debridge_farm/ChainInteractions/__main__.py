@@ -1,6 +1,10 @@
 from pprint import pprint
 
-from .chain_utils import send_dln_order
+from .chain_utils import (
+    send_dln_order,
+    query_erc_20_balance,
+    query_native_token_balance,
+)
 from .infura_utils import get_infura_url
 
 from ApiUtils import (
@@ -76,7 +80,21 @@ if __name__ == "__main__":
         quote_param=arbitrum_usdc_quote_param,
         infura_key="9e13214a449b4aaa903ec565642b91c0",
     )
-    print(tx)
+    print(tx, "\n\n")
+
+    arbitrum_usdc_balance = query_erc_20_balance(
+        infura_url=infura_url,
+        src_quote_param=arbitrum_usdc_quote_param,
+        account_address=address,
+    )
+
+    print(
+        f"Arbitrum {arbitrum_usdc_quote_param['token_info']['symbol']} balance: {arbitrum_usdc_balance}"
+    )
+
+    arbitrum_eth_balance = query_native_token_balance(
+        infura_url=infura_url, account_address=address
+    )
 
     # send_dln_order(
     #     infura_url=infura_url,

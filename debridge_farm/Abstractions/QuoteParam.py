@@ -1,6 +1,6 @@
 from typing import TypedDict
-from Abstractions.ChainInfo import ChainInfo
-from Abstractions.TokenInfo import TokenInfo
+from .ChainInfo import ChainInfo
+from .TokenInfo import TokenInfo
 
 
 class QuoteParam(TypedDict):

@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from Abstractions import ChainInfo, QuoteInfo, QuoteParam, TokenInfo, ChainTokenMap
+from ..Abstractions import ChainInfo, QuoteInfo, QuoteParam, TokenInfo, ChainTokenMap
 
 
 def pack_chain_token_info(chain_info: ChainInfo, token_info: TokenInfo) -> QuoteParam:
@@ -24,7 +24,7 @@ def retrieve_quote_info(response_dict: dict) -> QuoteInfo:
         "recommendedAmount"
     ]
     quote_info["points"] = response_dict["userPoints"]
-
+    quote_info["fixed_fee"] = response_dict["fixFee"]
     return quote_info
 
 

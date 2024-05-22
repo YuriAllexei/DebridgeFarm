@@ -1,6 +1,6 @@
 from typing import TypedDict, List, Dict
 
-from Abstractions import TokenInfo
+from .TokenInfo import TokenInfo
 
 
 class ChainTokenMap(TypedDict):

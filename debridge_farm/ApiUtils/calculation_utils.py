@@ -1,4 +1,4 @@
-from Abstractions import QuoteInfo
+from ..Abstractions import QuoteInfo
 
 
 def calculate_quote_metrics(quote_info: QuoteInfo):

@@ -8,3 +8,4 @@ class QuoteInfo(TypedDict):
     dst_recommended_amount: str
     dst_decimals: int
     points: float
+    fixed_fee: str

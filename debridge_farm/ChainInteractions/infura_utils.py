@@ -1,6 +1,6 @@
 import json
 
-from Abstractions import QuoteParam
+from ..Abstractions import QuoteParam
 
 
 def get_infura_url(quote_param: QuoteParam, infura_key: str) -> str:

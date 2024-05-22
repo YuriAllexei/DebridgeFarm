@@ -1,0 +1,13 @@
+{
+  "src_chains": {
+    "Arbitrum": ["USDC"],
+    "Optimism": ["USDC"]
+  },
+  "dst_chains": {
+    "Arbitrum": ["USDC"],
+    "Optimism": ["USDC", "USDT"],
+    "Ethereum": ["USDC"],
+    "Polygon": ["USDC"],
+    "Linea": ["USDC"]
+  }
+}
