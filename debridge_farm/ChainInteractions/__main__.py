@@ -77,7 +77,7 @@ if __name__ == "__main__":
     )
 
     infura_url = get_infura_url(
-        quote_param=arbitrum_usdc_quote_param,
+        chain_id=arbitrum_usdc_quote_param,
         infura_key="9e13214a449b4aaa903ec565642b91c0",
     )
     print(tx, "\n\n")

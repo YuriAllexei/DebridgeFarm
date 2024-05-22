@@ -3,9 +3,9 @@ import json
 from ..Abstractions import QuoteParam
 
 
-def get_infura_url(quote_param: QuoteParam, infura_key: str) -> str:
+def get_infura_url(chain_id: int, infura_key: str) -> str:
 
-    match quote_param["chain_info"]["chain_id"]:
+    match chain_id:
 
         case 1:
             return f"https://mainnet.infura.io/v3/{infura_key}"

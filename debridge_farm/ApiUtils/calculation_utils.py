@@ -18,7 +18,9 @@ def calculate_quote_metrics(quote_info: QuoteInfo):
 
     revenue = dst_recommended_amount - total_src_amount
 
-    print(f"Source fee: {src_operating_expense}")
+    print(f"Operating expenses: {src_operating_expense}")
     print(f"Margin: {src_token}")
     print(f"Amount received: {dst_recommended_amount}")
     print(f"Revenue: {revenue}")
+    print(f"Points: {quote_info['points']}")
+    print(f"Fixed fee: {int(quote_info['fixed_fee'])/ 10 ** 18}\n\n")

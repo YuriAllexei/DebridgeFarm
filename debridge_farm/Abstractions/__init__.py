@@ -5,3 +5,4 @@ from .QuoteInfo import QuoteInfo
 from .TxData import TxData
 from .ChainTokenMap import ChainTokenMap
 from .Route import Route
+from .user import User

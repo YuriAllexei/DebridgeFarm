@@ -31,13 +31,25 @@ def get_chain_token_list(chain_info: ChainInfo) -> List[TokenInfo]:
 
     for info in data["tokens"]:
         inner = data["tokens"][info]
+
+        address = inner["address"]
+        decimals = inner["decimals"]
+
+        is_eip = None
+
+        if "eip2612" in inner:
+            is_eip = inner["eip2612"]
+
+        symbol = inner["symbol"]
+        name = inner["name"]
+
         token_info.append(
             {
-                "address": inner["address"],
-                "decimals": inner["decimals"],
-                "is_eip": inner["eip2612"],
-                "symbol": inner["symbol"],
-                "name": inner["name"],
+                "address": address,
+                "decimals": decimals,
+                "is_eip": is_eip,
+                "symbol": symbol,
+                "name": name,
             }
         )
 
@@ -49,7 +61,6 @@ def get_quote(
 ) -> Optional[QuoteInfo]:
 
     token_in_amount = int(amount * (10 ** src_quote_param["token_info"]["decimals"]))
-    print(f"Token amount in decimals: {token_in_amount}")
     data = requests.get(
         f"https://api.dln.trade/v1.0/dln/order/quote?srcChainId={src_quote_param['chain_info']['chain_id']}&srcChainTokenIn={src_quote_param['token_info']['address']}&srcChainTokenInAmount={token_in_amount}&dstChainId={dst_quote_param['chain_info']['chain_id']}&dstChainTokenOut={dst_quote_param['token_info']['address']}&dstChainTokenOutAmount=auto&prependOperatingExpenses=true"
     ).json()
