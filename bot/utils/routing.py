@@ -1,4 +1,5 @@
 import itertools, time
+from pprint import pprint
 from threading import Lock
 from typing import Dict, List
 
@@ -13,9 +14,15 @@ from debridge_farm.ApiUtils import (
     pack_chain_token_info,
     get_quote,
     calculate_quote_metrics,
+    create_transaction,
 )
 
-from debridge_farm.ChainInteractions import get_infura_url
+from debridge_farm.ChainInteractions import (
+    get_infura_url,
+    query_erc_20_balance,
+    query_native_token_balance,
+    send_dln_order,
+)
 
 
 def calculate_routes(params_dict: Dict) -> Dict[str, List[Route]]:
@@ -55,6 +62,7 @@ def route_checker(
     data_lock: Lock,
 ):
 
+    amount = 2
     chain_list = get_chain_info()
 
     chain_map = chain_list_to_chain_map(chain_list=chain_list)
@@ -65,6 +73,8 @@ def route_checker(
         chain_id=src_chain_info["chain_id"],
         infura_key=user["infura_key"],
     )
+
+    print(f"Infura url: {infura_url}")
 
     while True:
 
@@ -91,6 +101,30 @@ def route_checker(
                 token_info=src_token_info,
             )
 
+            erc_20_balance = query_erc_20_balance(
+                infura_url=infura_url,
+                src_quote_param=src_quote_param,
+                account_address=user["address"],
+            )
+
+            print(
+                f"{src_quote_param['chain_info']['chain_name']} {src_quote_param['token_info']['name']} balance: {erc_20_balance}"
+            )
+
+            if erc_20_balance < amount:
+                print(
+                    f"Not enough {src_quote_param['token_info']} available for bridge"
+                )
+                continue
+
+            native_token_balance = query_native_token_balance(
+                infura_url=infura_url, account_address=user["address"]
+            )
+
+            print(
+                f"{src_quote_param['chain_info']['chain_name']} native balance: {native_token_balance}"
+            )
+
             dst_chain_info = chain_map[dst_chain_name]
 
             dst_token_info = query_chain_token_list(
@@ -112,8 +146,17 @@ def route_checker(
             quote = get_quote(
                 src_quote_param=src_quote_param,
                 dst_quote_param=dst_quote_param,
-                amount=10,
+                amount=amount,
             )
+
+            pprint(quote)
+
+            fixed_fee = int(quote["fixed_fee"]) / (10**18)
+
+            if native_token_balance <= fixed_fee:
+                print(
+                    f"Not enought native token balance to pay the fixed fee of {fixed_fee}"
+                )
 
             print(
                 f"Src chain: {src_chain_name} Src token: {src_chain_token}  Dst chain: {dst_chain_name} Dst token: {dst_chain_token}"
@@ -121,4 +164,19 @@ def route_checker(
 
             calculate_quote_metrics(quote_info=quote)
 
-            time.sleep(2)
+            tx = create_transaction(
+                address=user["address"],
+                quote_info=quote,
+                src_param=src_quote_param,
+                dst_param=dst_quote_param,
+            )
+
+            send_dln_order(
+                infura_url=infura_url,
+                address=user["address"],
+                tx_data=tx,
+                private_key=user["private_key"],
+                chain_info=src_chain_info,
+            )
+
+            return

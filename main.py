@@ -36,6 +36,7 @@ def main():
             target=route_checker,
             args=(user, chain, routes, chain_token_directory, data_lock),
             daemon=True,
+            name=f"{chain}-Thread",
         ).start()
 
     while True:

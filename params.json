@@ -1,6 +1,5 @@
 {
   "src_chains": {
-    "Arbitrum": ["USDC"],
     "Optimism": ["USDC"]
   },
   "dst_chains": {
