@@ -1,7 +1,10 @@
 import itertools, time
+from threading import Lock
 from typing import Dict, List
 
-from debridge_farm.Abstractions import Route, User
+from .data_utils import query_chain_token_list
+
+from debridge_farm.Abstractions import Route, User, ChainTokenMap
 from debridge_farm.ApiUtils import (
     get_chain_info,
     chain_list_to_chain_map,
@@ -44,17 +47,19 @@ def calculate_routes(params_dict: Dict) -> Dict[str, List[Route]]:
     return routes
 
 
-def route_checker(user: User, chain: str, routes_dict: Dict[str, List[Route]]):
+def route_checker(
+    user: User,
+    chain: str,
+    routes_dict: Dict[str, List[Route]],
+    chain_token_directory: Dict[str, ChainTokenMap],
+    data_lock: Lock,
+):
 
     chain_list = get_chain_info()
 
     chain_map = chain_list_to_chain_map(chain_list=chain_list)
 
     src_chain_info = chain_map[chain]
-
-    src_chain_tokens = get_chain_token_list(chain_info=src_chain_info)
-
-    src_token_map = chain_token_map(chain_info=src_chain_info, tokens=src_chain_tokens)
 
     infura_url = get_infura_url(
         chain_id=src_chain_info["chain_id"],
@@ -70,22 +75,38 @@ def route_checker(user: User, chain: str, routes_dict: Dict[str, List[Route]]):
             dst_chain_name = route["dst_chain"]
             dst_chain_token = route["dst_token"]
 
+            src_token_info = query_chain_token_list(
+                data_lock=data_lock,
+                chain_info=src_chain_info,
+                chain_token_directory=chain_token_directory,
+                token=src_chain_token,
+            )
+
+            if src_token_info is None:
+                print(f"No token info for {src_chain_token} in {src_chain_name}")
+                continue
+
             src_quote_param = pack_chain_token_info(
                 chain_info=src_chain_info,
-                token_info=src_token_map["tokens"][src_chain_token],
+                token_info=src_token_info,
             )
 
             dst_chain_info = chain_map[dst_chain_name]
 
-            dst_chain_tokens = get_chain_token_list(chain_info=dst_chain_info)
-
-            dst_token_map = chain_token_map(
-                chain_info=dst_chain_info, tokens=dst_chain_tokens
+            dst_token_info = query_chain_token_list(
+                data_lock=data_lock,
+                chain_info=dst_chain_info,
+                chain_token_directory=chain_token_directory,
+                token=dst_chain_token,
             )
+
+            if dst_token_info is None:
+                print(f"No token info for {src_chain_token} in {src_chain_name}")
+                continue
 
             dst_quote_param = pack_chain_token_info(
                 chain_info=dst_chain_info,
-                token_info=dst_token_map["tokens"][dst_chain_token],
+                token_info=dst_token_info,
             )
 
             quote = get_quote(
